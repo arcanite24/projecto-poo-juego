@@ -1,0 +1,69 @@
+package TileMap;
+
+import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
+
+import Main.GamePanel;
+
+public class TileMap {
+	
+	private double x;
+	private double y;
+	
+	private double xmax;
+	private double xmin;
+	private double ymax;
+	private double ymin;
+	private double tween;
+	
+	private int[][] map;
+	private int tileSize;
+	private int numRows;
+	private int numCols;
+	private int ancho;
+	private int alto;
+	
+	private BufferedImage tileset;
+	private int numTilesAcross;
+	private Tile[][] tiles;
+	
+	private int rowOffset;
+	private int colOffset;
+	private int rowsToDraw;
+	private int colsToDraw;
+	
+	public TileMap(int tilesize) {
+		this.tileSize = tilesize;
+		rowsToDraw = GamePanel.HEIGHT / tileSize;
+		colsToDraw = GamePanel.WIDTH / tileSize;
+		tween = 0.07;
+	}
+	
+	public void loadTiles(String s) {
+		
+		try {
+			
+			tileset  = ImageIO.read(getClass().getResourceAsStream(s));
+			numTilesAcross = tileset.getWidth() / tileSize;
+			tiles = new Tile[2][numTilesAcross];
+			
+			BufferedImage subimage;
+			for(int col=0; col<numTilesAcross; col++) {
+				subimage = tileset.getSubimage(col*tileSize, 0, tileSize, tileSize);
+				tiles[0][col] = new Tile(subimage, Tile.NORMAL);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void loadMap(String s) {
+		
+	}
+	
+	
+
+}

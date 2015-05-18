@@ -1,0 +1,8 @@
+package TileMap;
+
+public class TileMap {
+	
+	private double x;
+	private double y;
+
+}

@@ -1,0 +1,34 @@
+package TileMap;
+
+import java.awt.image.BufferedImage;
+
+public class TileMap {
+	
+	private double x;
+	private double y;
+	
+	private double xmax;
+	private double xmin;
+	private double ymax;
+	private double ymin;
+	private double tween;
+	
+	private int[][] map;
+	private int tileSize;
+	private int numRows;
+	private int numCols;
+	private int ancho;
+	private int alto;
+	
+	private BufferedImage tileset;
+	private int numTilesAcross;
+	private Tile[][] tiles;
+	
+	private int rowOffset;
+	private int colOffset;
+	private int rowsToDraw;
+	private int colsToDraw;
+	
+	
+
+}

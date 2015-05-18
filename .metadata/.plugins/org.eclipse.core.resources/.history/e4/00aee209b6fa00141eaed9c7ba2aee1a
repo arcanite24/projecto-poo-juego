@@ -1,0 +1,58 @@
+package com.poo.gameStates;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+
+import com.poo.TileMap.Background;
+
+public class MenuState extends GameState {
+	
+	private Background bg;
+	
+	private String[] options = { "Iniciar", "Opciones", "Salir" };
+	private int menuActual = 0;
+	
+	private Color color;
+	private Font titleFont;
+	private Font font;
+	
+	public MenuState(GameStateManager manager) {
+		this.manager = manager;
+		
+		try {
+			bg = new Background("/Backgrounds/bg.png", 1);
+			bg.setVector(-0.1, 0);
+			
+			color = new Color(128, 0, 0);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void draw(Graphics2D g) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void keyPressed(int k) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void keyReleased(int k) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

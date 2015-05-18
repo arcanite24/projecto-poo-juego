@@ -1,0 +1,13 @@
+package TileMap;
+
+public class TileMap {
+	
+	private double x;
+	private double y;
+	
+	private double xmax;
+	private double xmin;
+	private double ymax;
+	private double ymin;
+
+}

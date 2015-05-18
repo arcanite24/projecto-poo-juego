@@ -1,0 +1,26 @@
+package com.poo.TileMap;
+
+import java.awt.image.BufferedImage;
+
+import javax.imageio.ImageIO;
+
+public class Background {
+	
+	private BufferedImage imagen;
+	
+	private double x;
+	private double y;
+	private double dx;
+	private double dy;
+	
+	private double moveScale;
+	
+	public Background(String s, double ms) {
+		try {
+			imagen = ImageIO.read(getClass().getResourceAsStream(s));
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}
