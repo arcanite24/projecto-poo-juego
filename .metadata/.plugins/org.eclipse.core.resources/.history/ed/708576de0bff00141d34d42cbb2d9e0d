@@ -1,0 +1,56 @@
+package Entity;
+
+import TileMap.TileMap;
+
+public abstract class MapObject {
+	
+	protected TileMap tilemap;
+	protected int tilesize;
+	protected double xmap;
+	protected double ymap;
+	
+	protected double x;
+	protected double y;
+	protected double dx;
+	protected double dy;
+	
+	protected int ancho;
+	protected int alto;
+	
+	protected int colancho;
+	protected int colalto;
+	
+	protected int currRow;
+	protected int currCol;
+	protected int xdest;
+	protected int ydest;
+	protected int xtemp;
+	protected int ytemp;
+	
+	protected boolean topLeft;
+	protected boolean topRight;
+	protected boolean botLeft;
+	protected boolean botRight;
+	
+	protected Animation animation;
+	protected int preAction;
+	protected int currAction;
+	protected int facingRight;
+	
+	protected boolean left;
+	protected boolean right;
+	protected boolean up;
+	protected boolean down;
+	protected boolean jumping;
+	protected boolean falling;
+	
+	protected double moveSpeed;
+	protected double maxSpeed;
+	protected double gravity;
+	protected double stopSpeed;
+	
+	
+
+	
+	
+}

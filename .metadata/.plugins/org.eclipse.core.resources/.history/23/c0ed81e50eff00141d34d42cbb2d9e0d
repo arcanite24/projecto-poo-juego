@@ -1,0 +1,101 @@
+package Entity;
+
+import java.awt.Rectangle;
+
+import TileMap.TileMap;
+
+public abstract class MapObject {
+	
+	protected TileMap tilemap;
+	protected int tilesize;
+	protected double xmap;
+	protected double ymap;
+	
+	protected double x;
+	protected double y;
+	protected double dx;
+	protected double dy;
+	
+	protected int ancho;
+	protected int alto;
+	
+	protected int colancho;
+	protected int colalto;
+	
+	protected int currRow;
+	protected int currCol;
+	protected double xdest;
+	protected double ydest;
+	protected int xtemp;
+	protected int ytemp;
+	
+	protected boolean topLeft;
+	protected boolean topRight;
+	protected boolean botLeft;
+	protected boolean botRight;
+	
+	protected Animation animation;
+	protected int preAction;
+	protected int currAction;
+	protected int facingRight;
+	
+	protected boolean left;
+	protected boolean right;
+	protected boolean up;
+	protected boolean down;
+	protected boolean jumping;
+	protected boolean falling;
+	
+	protected double moveSpeed;
+	protected double maxSpeed;
+	protected double gravity;
+	protected double stopSpeed;
+	protected double maxGravity;
+	protected double maxJump;
+	protected double jumpStart;
+	
+	public MapObject(TileMap tm) {
+		tilemap = tm;
+		tilesize = tm.getTileSize();
+	}
+	
+	public boolean intersects(MapObject o) {
+		Rectangle r1 = getRectangle();
+		Rectangle r2 = o.getRectangle();
+		return r1.intersects(r2);
+	}
+	
+	public Rectangle getRectangle() {
+		return new Rectangle((int)x - colancho, (int)y - colalto, colancho, colalto);
+	}
+	
+	public void calculateCorners(double x, double y) {
+		
+		int leftTile = (int)(x - colancho / 2) / tilesize;
+		int rightTile = (int)(x + colancho / 2 - 1) / tilesize;
+		int topTile = (int)(y - colalto / 2) / tilesize;
+		int botTile = (int)(y + colalto / 2 - 1) / tilesize;
+		
+		int tl = tilemap.getType(topTile, leftTile);
+		int tr = tilemap.getType(topTile, rightTile);
+		int bl = tilemap.getType(botTile, leftTile);
+		int br = tilemap.getType(botTile, rightTile);
+				
+		
+	}
+	
+	public void checkTilemapCollision() {
+		
+		currCol = (int)x / tilesize;
+		currRow = (int)y / tilesize;
+		
+		xdest = x + dx;
+		ydest = y + dy;
+		
+		calculateCorners(x, ydest);
+	}
+	
+
+	
+	
+}

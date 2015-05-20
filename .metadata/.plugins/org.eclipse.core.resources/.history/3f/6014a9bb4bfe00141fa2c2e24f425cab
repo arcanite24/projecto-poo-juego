@@ -1,0 +1,6 @@
+package Entity;
+
+public abstract class MapObject {
+	
+	protected TileMap tilemap;
+}
