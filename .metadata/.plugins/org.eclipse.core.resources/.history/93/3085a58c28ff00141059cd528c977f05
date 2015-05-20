@@ -6,23 +6,15 @@ import java.awt.event.KeyEvent;
 
 import Entity.Player;
 import Main.GamePanel;
-import TileMap.Background;
 import TileMap.TileMap;
 
 public class Level1State extends GameState {
 	
 	private TileMap tilemap;
 	private Player player;
-	private Background bg1;
-	private Background bg2;
-	
 	
 	public Level1State(GameStateManager gsm) {
 		this.gsm = gsm;
-		bg1 = new Background("/Backgrounds/bg.png", 0.5);
-		bg1.setVector(-0.1, 0);
-		bg2 = new Background("/Backgrounds/bg2.png", 0.5);
-		bg2.setVector(-0.2, 0);
 		init();
 	}
 
@@ -42,8 +34,6 @@ public class Level1State extends GameState {
 		// TODO Auto-generated method stub
 		player.update();
 		tilemap.setPosition(GamePanel.WIDTH / 2 - player.getx(),GamePanel.HEIGHT / 2 - player.getx());
-		bg1.update();
-		bg2.update();
 		
 	}
 
@@ -51,12 +41,9 @@ public class Level1State extends GameState {
 	public void draw(Graphics2D g) {
 		
 		g.setColor(Color.WHITE);
-		g.fillRect(0,0,GamePanel.WIDTH,GamePanel.HEIGHT);
-		bg1.draw(g);
-		bg2.draw(g);
+		g.fillRect(0,0,GamePanel.WIDTH,GamePanel.HEIGHT); 
 		tilemap.draw(g);
 		player.draw(g);
-		
 		
 	}
 
@@ -67,8 +54,8 @@ public class Level1State extends GameState {
 		if(k == KeyEvent.VK_S) player.setDown(true);
 		if(k == KeyEvent.VK_SPACE) player.setJumping(true);
 		if(k == KeyEvent.VK_SHIFT) player.setGliding(true);
-		if(k == KeyEvent.VK_P) player.setScratching();
-		if(k == KeyEvent.VK_O) player.setFiring();
+		if(k == KeyEvent.VK_R) player.setScratching();
+		if(k == KeyEvent.VK_F) player.setFiring();
 	}
 	
 	public void keyReleased(int k) {

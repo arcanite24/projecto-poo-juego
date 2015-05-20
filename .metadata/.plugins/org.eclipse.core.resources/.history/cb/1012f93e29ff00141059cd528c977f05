@@ -19,9 +19,9 @@ public class Level1State extends GameState {
 	
 	public Level1State(GameStateManager gsm) {
 		this.gsm = gsm;
-		bg1 = new Background("/Backgrounds/bg.png", 0.5);
+		bg1 = new Background("/Backgrounds/bg.png", 1);
 		bg1.setVector(-0.1, 0);
-		bg2 = new Background("/Backgrounds/bg2.png", 0.5);
+		bg2 = new Background("/Backgrounds/bg2.png", 1);
 		bg2.setVector(-0.2, 0);
 		init();
 	}
@@ -52,8 +52,8 @@ public class Level1State extends GameState {
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(0,0,GamePanel.WIDTH,GamePanel.HEIGHT);
-		bg1.draw(g);
-		bg2.draw(g);
+		bg1.update();
+		bg2.update();
 		tilemap.draw(g);
 		player.draw(g);
 		
