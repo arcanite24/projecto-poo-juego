@@ -1,5 +1,0 @@
-package com.poo.gameStates;
-
-public abstract class GameState {
-
-}

@@ -8,16 +8,12 @@ import java.awt.event.KeyEvent;
 public class MenuState extends GameState {
 	
 	private Background bg;
-	private Background bg2;
-	private Background bg3;
 	
 	private int currentChoice = 0;
 	private String[] options = {
 		"Iniciar",
-		"Opciones",
 		"Salir",
-		"Opcion 2 :v",
-		"Opcion 3"
+		"Opcion :v"
 	};
 	
 	private Color titleColor;
@@ -30,47 +26,35 @@ public class MenuState extends GameState {
 		this.gsm = gsm;
 		
 		try {
-			
-			bg = new Background("/Backgrounds/bg.png", 1);
+			bg = new Background("/Backgrounds/menubg.gif", 1);
 			bg.setVector(-0.1, 0);
-			bg2 = new Background("/Backgrounds/bg2.png", 1);
-			bg2.setVector(-0.2, 0);
-			bg3 = new Background("/Backgrounds/bg3.png", 1);
-			bg3.setVector(-0.3, 0);
 			
-			titleColor = new Color(255, 255, 255);
-			titleFont = new Font("Century Gothic", Font.PLAIN, 36);
+			titleColor = new Color(128, 0, 0);
+			titleFont = new Font(
+					"Century Gothic",
+					Font.PLAIN,
+					28);
 			
 			font = new Font("Arial", Font.PLAIN, 12);
-			
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public void init() {}
 	
 	public void update() {
 		bg.update();
-		bg2.update();
-		bg3.update();
 	}
 	
 	public void draw(Graphics2D g) {
-		
-		// draw bg
 		bg.draw(g);
-		bg2.draw(g);
-		bg3.draw(g);
-		
-		// draw title
+
 		g.setColor(titleColor);
 		g.setFont(titleFont);
-		g.drawString("Juego :v", 270, 70);
-		
-		// draw menu options
+		g.drawString("Dragon Tale", 80, 70);
+
 		g.setFont(font);
 		for(int i = 0; i < options.length; i++) {
 			if(i == currentChoice) {
@@ -79,7 +63,7 @@ public class MenuState extends GameState {
 			else {
 				g.setColor(Color.RED);
 			}
-			g.drawString(options[i], 300, 140 + i * 15);
+			g.drawString(options[i], 145, 140 + i * 15);
 		}
 		
 	}
@@ -89,7 +73,7 @@ public class MenuState extends GameState {
 			gsm.setState(GameStateManager.LEVEL1STATE);
 		}
 		if(currentChoice == 1) {
-			// help
+			
 		}
 		if(currentChoice == 2) {
 			System.exit(0);

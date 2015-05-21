@@ -1,15 +1,16 @@
 package Entity;
 
 import TileMap.*;
+import Audio.AudioPlayer;
 
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 
 public class Player extends MapObject {
-	
-	// player stuff
+
 	private int health;
 	private int maxHealth;
 	private int fire;
@@ -17,28 +18,23 @@ public class Player extends MapObject {
 	private boolean dead;
 	private boolean flinching;
 	private long flinchTimer;
-	
-	// fireball
+
 	private boolean firing;
 	private int fireCost;
 	private int fireBallDamage;
-	//private ArrayList<FireBall> fireBalls;
-	
-	// scratch
+	private ArrayList<FireBall> fireBalls;
+
 	private boolean scratching;
 	private int scratchDamage;
 	private int scratchRange;
-	
-	// gliding
+
 	private boolean gliding;
-	
-	// animations
+
 	private ArrayList<BufferedImage[]> sprites;
 	private final int[] numFrames = {
 		2, 8, 1, 2, 4, 2, 5
 	};
-	
-	// animation actions
+
 	private static final int IDLE = 0;
 	private static final int WALKING = 1;
 	private static final int JUMPING = 2;
@@ -46,6 +42,8 @@ public class Player extends MapObject {
 	private static final int GLIDING = 4;
 	private static final int FIREBALL = 5;
 	private static final int SCRATCHING = 6;
+	
+	private HashMap<String, AudioPlayer> sfx;
 	
 	public Player(TileMap tm) {
 		
@@ -71,12 +69,11 @@ public class Player extends MapObject {
 		
 		fireCost = 200;
 		fireBallDamage = 5;
-		//fireBalls = new ArrayList<FireBall>();
+		fireBalls = new ArrayList<FireBall>();
 		
 		scratchDamage = 8;
 		scratchRange = 40;
-		
-		// load sprites
+
 		try {
 			
 			BufferedImage spritesheet = ImageIO.read(getClass().getResourceAsStream("/Sprites/Player/playersprites.gif"));
@@ -89,19 +86,15 @@ public class Player extends MapObject {
 				
 				for(int j = 0; j < numFrames[i]; j++) {
 					
-					if(i != 6) {
+					if(i != SCRATCHING) {
 						bi[j] = spritesheet.getSubimage(j * width,i * height,width,height);
 					}
 					else {
-						bi[j] = spritesheet.getSubimage(j * width * 2,i * height,width,height);
+						bi[j] = spritesheet.getSubimage(j * width * 2,i * height,width * 2,height);
 					}
-					
 				}
-				
-				sprites.add(bi);
-				
-			}
-			
+				sprites.add(bi);	
+			}			
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -111,6 +104,10 @@ public class Player extends MapObject {
 		currentAction = IDLE;
 		animation.setFrames(sprites.get(IDLE));
 		animation.setDelay(400);
+		
+		sfx = new HashMap<String, AudioPlayer>();
+		sfx.put("jump", new AudioPlayer("/SFX/jump.mp3"));
+		sfx.put("scratch", new AudioPlayer("/SFX/scratch.mp3"));
 		
 	}
 	
@@ -129,9 +126,53 @@ public class Player extends MapObject {
 		gliding = b;
 	}
 	
-	private void getNextPosition() {
+	public void checkAttack(ArrayList<Enemy> enemies) {
 		
-		// movement
+		// checar todos los enemigos
+		for(int i = 0; i < enemies.size(); i++) {
+			
+			Enemy e = enemies.get(i);
+			
+			if(scratching) {
+				if(facingRight) {
+					if(e.getx() > x && e.getx() < x + scratchRange && e.gety() > y - height / 2 && e.gety() < y + height / 2) {
+						e.hit(scratchDamage);
+					}
+				}
+				else {
+					if(e.getx() < x &&e.getx() > x - scratchRange &&e.gety() > y - height / 2 &&e.gety() < y + height / 2) {
+						e.hit(scratchDamage);
+					}
+				}
+			}
+			
+			// balas
+			for(int j = 0; j < fireBalls.size(); j++) {
+				if(fireBalls.get(j).intersects(e)) {
+					e.hit(fireBallDamage);
+					fireBalls.get(j).setHit();
+					break;
+				}
+			}
+			
+			// colision enemigos
+			if(intersects(e)) {
+				hit(e.getDamage());
+			}
+		}		
+	}
+	
+	public void hit(int damage) {
+		if(flinching) return;
+		health -= damage;
+		if(health < 0) health = 0;
+		if(health == 0) dead = true;
+		flinching = true;
+		flinchTimer = System.nanoTime();
+	}
+	
+	private void getNextPosition() {
+
 		if(left) {
 			dx -= moveSpeed;
 			if(dx < -maxSpeed) {
@@ -159,20 +200,16 @@ public class Player extends MapObject {
 			}
 		}
 		
-
-		if(
-		(currentAction == SCRATCHING || currentAction == FIREBALL) &&
-		!(jumping || falling)) {
+		if((currentAction == SCRATCHING || currentAction == FIREBALL) &&!(jumping || falling)) {
 			dx = 0;
 		}
 		
-
 		if(jumping && !falling) {
+			sfx.get("jump").play();
 			dy = jumpStart;
-			falling = true;	
+			falling = true;
 		}
 		
-
 		if(falling) {
 			
 			if(dy > 0 && gliding) dy += fallSpeed * 0.1;
@@ -189,14 +226,47 @@ public class Player extends MapObject {
 	
 	public void update() {
 		
-
 		getNextPosition();
 		checkTileMapCollision();
 		setPosition(xtemp, ytemp);
 		
-	
+		if(currentAction == SCRATCHING) {
+			if(animation.hasPlayedOnce()) scratching = false;
+		}
+		if(currentAction == FIREBALL) {
+			if(animation.hasPlayedOnce()) firing = false;
+		}
+		
+		fire += 1;
+		if(fire > maxFire) fire = maxFire;
+		if(firing && currentAction != FIREBALL) {
+			if(fire > fireCost) {
+				fire -= fireCost;
+				FireBall fb = new FireBall(tileMap, facingRight);
+				fb.setPosition(x, y);
+				fireBalls.add(fb);
+			}
+		}
+		
+		for(int i = 0; i < fireBalls.size(); i++) {
+			fireBalls.get(i).update();
+			if(fireBalls.get(i).shouldRemove()) {
+				fireBalls.remove(i);
+				i--;
+			}
+		}
+		
+		if(flinching) {
+			long elapsed =
+				(System.nanoTime() - flinchTimer) / 1000000;
+			if(elapsed > 1000) {
+				flinching = false;
+			}
+		}
+		
 		if(scratching) {
 			if(currentAction != SCRATCHING) {
+				sfx.get("scratch").play();
 				currentAction = SCRATCHING;
 				animation.setFrames(sprites.get(SCRATCHING));
 				animation.setDelay(50);
@@ -265,7 +335,10 @@ public class Player extends MapObject {
 		
 		setMapPosition();
 		
-
+		for(int i = 0; i < fireBalls.size(); i++) {
+			fireBalls.get(i).draw(g);
+		}
+		
 		if(flinching) {
 			long elapsed =
 				(System.nanoTime() - flinchTimer) / 1000000;
@@ -274,43 +347,8 @@ public class Player extends MapObject {
 			}
 		}
 		
-		if(facingRight) {
-			g.drawImage(
-				animation.getImage(),
-				(int)(x + xmap - width / 2),
-				(int)(y + ymap - height / 2),
-				null
-			);
-		}
-		else {
-			g.drawImage(
-				animation.getImage(),
-				(int)(x + xmap - width / 2 + width),
-				(int)(y + ymap - height / 2),
-				-width,
-				height,
-				null
-			);
-			
-		}
+		super.draw(g);
 		
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -7,23 +7,23 @@ import TileMap.Tile;
 import java.awt.Rectangle;
 
 public abstract class MapObject {
-	
+
 	protected TileMap tileMap;
 	protected int tileSize;
 	protected double xmap;
 	protected double ymap;
-	
+
 	protected double x;
 	protected double y;
 	protected double dx;
 	protected double dy;
-	
+
 	protected int width;
 	protected int height;
-	
+
 	protected int cwidth;
 	protected int cheight;
-	
+
 	protected int currRow;
 	protected int currCol;
 	protected double xdest;
@@ -34,19 +34,19 @@ public abstract class MapObject {
 	protected boolean topRight;
 	protected boolean bottomLeft;
 	protected boolean bottomRight;
-	
+
 	protected Animation animation;
 	protected int currentAction;
 	protected int previousAction;
 	protected boolean facingRight;
-	
+
 	protected boolean left;
 	protected boolean right;
 	protected boolean up;
 	protected boolean down;
 	protected boolean jumping;
 	protected boolean falling;
-	
+
 	protected double moveSpeed;
 	protected double maxSpeed;
 	protected double stopSpeed;
@@ -55,7 +55,6 @@ public abstract class MapObject {
 	protected double jumpStart;
 	protected double stopJumpSpeed;
 	
-
 	public MapObject(TileMap tm) {
 		tileMap = tm;
 		tileSize = tm.getTileSize(); 
@@ -68,12 +67,7 @@ public abstract class MapObject {
 	}
 	
 	public Rectangle getRectangle() {
-		return new Rectangle(
-				(int)x - cwidth,
-				(int)y - cheight,
-				cwidth,
-				cheight
-		);
+		return new Rectangle((int)x - cwidth,(int)y - cheight,cwidth,cheight);
 	}
 	
 	public void calculateCorners(double x, double y) {
@@ -173,8 +167,8 @@ public abstract class MapObject {
 	}
 	
 	public void setMapPosition() {
-		xmap = tileMap.getX();
-		ymap = tileMap.getY();
+		xmap = tileMap.getx();
+		ymap = tileMap.gety();
 	}
 	
 	public void setLeft(boolean b) { left = b; }
@@ -190,6 +184,14 @@ public abstract class MapObject {
 			y + ymap - height > GamePanel.HEIGHT;
 	}
 	
+	public void draw(java.awt.Graphics2D g) {
+		if(facingRight) {
+			g.drawImage(animation.getImage(),(int)(x + xmap - width / 2),(int)(y + ymap - height / 2),null);
+		}
+		else {
+			g.drawImage(animation.getImage(),(int)(x + xmap - width / 2 + width),(int)(y + ymap - height / 2),-width,height,null);
+		}
+	}
 }
 
 

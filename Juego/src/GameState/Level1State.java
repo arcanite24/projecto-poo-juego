@@ -1,83 +1,159 @@
 package GameState;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-
-import Entity.Player;
 import Main.GamePanel;
-import TileMap.Background;
-import TileMap.TileMap;
+import TileMap.*;
+import Entity.*;
+import Entity.Enemies.*;
+import Audio.AudioPlayer;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class Level1State extends GameState {
 	
-	private TileMap tilemap;
-	private Player player;
-	private Background bg1;
-	private Background bg2;
+	private TileMap tileMap;
+	private Background bg;
 	
+	private Player player;
+	
+	private ArrayList<Enemy> enemies;
+	private ArrayList<Explosion> explosions;
+	
+	private HUD hud;
+	
+	private AudioPlayer bgMusic;
 	
 	public Level1State(GameStateManager gsm) {
 		this.gsm = gsm;
-		bg1 = new Background("/Backgrounds/bg.png", 0.5);
-		bg1.setVector(-0.1, 0);
-		bg2 = new Background("/Backgrounds/bg2.png", 0.5);
-		bg2.setVector(-0.2, 0);
 		init();
 	}
-
-	@Override
+	
 	public void init() {
-		tilemap = new TileMap(32);
-		tilemap.loadTiles("/Tilesets/tiles.png");
-		tilemap.loadMap("/Maps/map.map");
-		tilemap.setPosition(0, 0);
 		
-		player = new Player(tilemap);
-		player.setPosition(200,200);
+		tileMap = new TileMap(30);
+		tileMap.loadTiles("/Tilesets/grasstileset.gif");
+		tileMap.loadMap("/Maps/level1-1.map");
+		tileMap.setPosition(0, 0);
+		tileMap.setTween(1);
+		
+		bg = new Background("/Backgrounds/grassbg1.gif", 0.1);
+		
+		player = new Player(tileMap);
+		player.setPosition(100, 100);
+		
+		populateEnemies();
+		
+		explosions = new ArrayList<Explosion>();
+		
+		hud = new HUD(player);
+		
+		bgMusic = new AudioPlayer("/Music/level1-1.mp3");
+		bgMusic.play();
+		
 	}
-
-	@Override
+	
+	private void populateEnemies() {
+		
+		enemies = new ArrayList<Enemy>();
+		
+		Slugger s;
+		Point[] points = new Point[] {
+			new Point(200, 100),
+			new Point(860, 200),
+			new Point(1525, 200),
+			new Point(1680, 200),
+			new Point(1800, 200)
+		};
+		for(int i = 0; i < points.length; i++) {
+			s = new Slugger(tileMap);
+			s.setPosition(points[i].x, points[i].y);
+			enemies.add(s);
+		}
+		
+	}
+	
 	public void update() {
-		// TODO Auto-generated method stub
+		
 		player.update();
-		tilemap.setPosition(GamePanel.WIDTH / 2 - player.getx(),GamePanel.HEIGHT / 2 - player.getx());
-		bg1.update();
-		bg2.update();
+		tileMap.setPosition(
+			GamePanel.WIDTH / 2 - player.getx(),
+			GamePanel.HEIGHT / 2 - player.gety()
+		);
 		
+		bg.setPosition(tileMap.getx(), tileMap.gety());
+		
+		player.checkAttack(enemies);
+		
+		for(int i = 0; i < enemies.size(); i++) {
+			Enemy e = enemies.get(i);
+			e.update();
+			if(e.isDead()) {
+				enemies.remove(i);
+				i--;
+				explosions.add(
+					new Explosion(e.getx(), e.gety()));
+			}
+		}
+		
+		for(int i = 0; i < explosions.size(); i++) {
+			explosions.get(i).update();
+			if(explosions.get(i).shouldRemove()) {
+				explosions.remove(i);
+				i--;
+			}
+		}
 	}
-
-	@Override
+	
 	public void draw(Graphics2D g) {
-		
-		g.setColor(Color.WHITE);
-		g.fillRect(0,0,GamePanel.WIDTH,GamePanel.HEIGHT);
-		bg1.draw(g);
-		bg2.draw(g);
-		tilemap.draw(g);
+
+		bg.draw(g);
+		tileMap.draw(g);
 		player.draw(g);
 		
-		
-	}
+		for(int i = 0; i < enemies.size(); i++) {
+			enemies.get(i).draw(g);
+		}
 
+		for(int i = 0; i < explosions.size(); i++) {
+			explosions.get(i).setMapPosition(
+				(int)tileMap.getx(), (int)tileMap.gety());
+			explosions.get(i).draw(g);
+		}
+		
+		hud.draw(g);
+	}
+	
 	public void keyPressed(int k) {
-		if(k == KeyEvent.VK_A) player.setLeft(true);
-		if(k == KeyEvent.VK_D) player.setRight(true);
-		if(k == KeyEvent.VK_W) player.setUp(true);
-		if(k == KeyEvent.VK_S) player.setDown(true);
-		if(k == KeyEvent.VK_SPACE) player.setJumping(true);
-		if(k == KeyEvent.VK_SHIFT) player.setGliding(true);
-		if(k == KeyEvent.VK_P) player.setScratching();
-		if(k == KeyEvent.VK_O) player.setFiring();
+		if(k == KeyEvent.VK_LEFT) player.setLeft(true);
+		if(k == KeyEvent.VK_RIGHT) player.setRight(true);
+		if(k == KeyEvent.VK_UP) player.setUp(true);
+		if(k == KeyEvent.VK_DOWN) player.setDown(true);
+		if(k == KeyEvent.VK_W) player.setJumping(true);
+		if(k == KeyEvent.VK_E) player.setGliding(true);
+		if(k == KeyEvent.VK_R) player.setScratching();
+		if(k == KeyEvent.VK_F) player.setFiring();
 	}
 	
 	public void keyReleased(int k) {
-		if(k == KeyEvent.VK_A) player.setLeft(false);
-		if(k == KeyEvent.VK_D) player.setRight(false);
-		if(k == KeyEvent.VK_W) player.setUp(false);
-		if(k == KeyEvent.VK_S) player.setDown(false);
-		if(k == KeyEvent.VK_SPACE) player.setJumping(false);
-		if(k == KeyEvent.VK_SHIFT) player.setGliding(false);
+		if(k == KeyEvent.VK_LEFT) player.setLeft(false);
+		if(k == KeyEvent.VK_RIGHT) player.setRight(false);
+		if(k == KeyEvent.VK_UP) player.setUp(false);
+		if(k == KeyEvent.VK_DOWN) player.setDown(false);
+		if(k == KeyEvent.VK_W) player.setJumping(false);
+		if(k == KeyEvent.VK_E) player.setGliding(false);
 	}
-
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
